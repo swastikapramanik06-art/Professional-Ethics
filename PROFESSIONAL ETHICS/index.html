@@ -1,0 +1,1495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>EthosEngine — Professional Ethics Assessment</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0c10;
+  --bg-2: #0f1219;
+  --bg-3: #151922;
+  --surface: #1a1f2e;
+  --surface-2: #222840;
+  --border: rgba(255,255,255,0.08);
+  --border-2: rgba(255,255,255,0.14);
+  --accent: #e8ff47;
+  --accent-dim: rgba(232,255,71,0.12);
+  --accent-glow: rgba(232,255,71,0.3);
+  --blue: #4f8eff;
+  --blue-dim: rgba(79,142,255,0.12);
+  --teal: #2ee8c4;
+  --orange: #ff8c42;
+  --red: #ff4f6b;
+  --purple: #a77bff;
+  --text: #f0f2f8;
+  --text-2: #9aa3ba;
+  --text-3: #5a6480;
+  --font-display: 'Syne', sans-serif;
+  --font-serif: 'Instrument Serif', serif;
+  --font-mono: 'DM Mono', monospace;
+  --radius: 16px;
+  --radius-sm: 8px;
+  --radius-lg: 24px;
+  --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --shadow: 0 8px 40px rgba(0,0,0,0.4);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--text); font-family: var(--font-display); line-height: 1.6; overflow-x: hidden; }
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--surface-2); border-radius: 3px; }
+::selection { background: var(--accent); color: var(--bg); }
+.container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
+.hidden { display: none !important; }
+.italic { font-family: var(--font-serif); font-style: italic; }
+.accent { color: var(--accent); }
+.centered { text-align: center; }
+
+.section-tag {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.15em;
+  text-transform: uppercase; color: var(--accent);
+  border: 1px solid var(--accent-dim); background: var(--accent-dim);
+  padding: 6px 14px; border-radius: 100px; margin-bottom: 1.5rem;
+}
+.section-tag::before { content: '//'; opacity: 0.5; }
+.section-title { font-family: var(--font-display); font-size: clamp(2rem, 4vw, 3rem); font-weight: 800; line-height: 1.1; color: var(--text); margin-bottom: 1rem; }
+.section-title em { font-family: var(--font-serif); font-style: italic; font-weight: 400; color: var(--accent); }
+.section-subtitle { color: var(--text-2); font-size: 1.1rem; max-width: 600px; margin: 0 auto 3rem; text-align: center; }
+
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: var(--accent); color: var(--bg);
+  font-family: var(--font-display); font-size: 0.9rem; font-weight: 700;
+  padding: 14px 28px; border: none; border-radius: 100px;
+  cursor: pointer; transition: var(--transition); letter-spacing: 0.02em;
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px var(--accent-glow); }
+.btn-primary.large { padding: 18px 40px; font-size: 1rem; }
+.btn-arrow { font-size: 1.1rem; transition: transform 0.2s; }
+.btn-primary:hover .btn-arrow { transform: translateX(4px); }
+.btn-ghost {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: transparent; color: var(--text-2);
+  font-family: var(--font-display); font-size: 0.9rem; font-weight: 600;
+  padding: 14px 28px; border: 1px solid var(--border-2); border-radius: 100px;
+  cursor: pointer; transition: var(--transition);
+}
+.btn-ghost:hover { background: var(--surface); color: var(--text); }
+
+/* NAVBAR */
+.navbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1rem 2.5rem;
+  background: rgba(10,12,16,0.8); backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border); transition: var(--transition);
+}
+.navbar.scrolled { background: rgba(10,12,16,0.95); }
+.nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.brand-icon { font-size: 1.4rem; color: var(--accent); }
+.brand-name { font-family: var(--font-display); font-weight: 800; font-size: 1.1rem; color: var(--text); letter-spacing: -0.02em; }
+.nav-links { display: flex; gap: 0; list-style: none; }
+.nav-link { display: block; padding: 8px 16px; color: var(--text-2); text-decoration: none; font-size: 0.88rem; font-weight: 600; transition: color 0.2s; border-radius: var(--radius-sm); }
+.nav-link:hover, .nav-link.active { color: var(--text); }
+.nav-cta { padding: 10px 22px; font-size: 0.85rem; }
+.hamburger { display: none; flex-direction: column; gap: 5px; background: none; border: none; cursor: pointer; padding: 4px; }
+.hamburger span { display: block; width: 22px; height: 2px; background: var(--text); border-radius: 2px; transition: var(--transition); }
+
+/* HERO */
+.hero { min-height: 100vh; display: flex; align-items: center; padding: 8rem 2.5rem 4rem; position: relative; overflow: hidden; }
+.hero-bg { position: absolute; inset: 0; z-index: 0; }
+.grid-overlay {
+  position: absolute; inset: 0;
+  background-image: linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+.orb { position: absolute; border-radius: 50%; filter: blur(80px); }
+.orb-1 { width: 500px; height: 500px; background: radial-gradient(circle, rgba(232,255,71,0.08) 0%, transparent 70%); top: -100px; right: 10%; }
+.orb-2 { width: 400px; height: 400px; background: radial-gradient(circle, rgba(79,142,255,0.08) 0%, transparent 70%); bottom: 10%; left: 5%; }
+.hero-content { position: relative; z-index: 1; max-width: 620px; }
+.hero-badge { display: inline-flex; align-items: center; gap: 10px; font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-2); background: var(--surface); border: 1px solid var(--border); border-radius: 100px; padding: 8px 16px; margin-bottom: 2rem; }
+.badge-dot { width: 7px; height: 7px; background: var(--accent); border-radius: 50%; animation: pulse 2s infinite; }
+.hero-title { display: flex; flex-direction: column; font-size: clamp(3.5rem, 7vw, 6rem); font-weight: 800; line-height: 0.95; letter-spacing: -0.03em; margin-bottom: 1.5rem; }
+.title-line { display: block; opacity: 0; transform: translateY(30px); animation: slideUp 0.8s ease forwards; }
+.title-line:nth-child(1) { animation-delay: 0.1s; }
+.title-line:nth-child(2) { animation-delay: 0.2s; font-family: var(--font-serif); font-style: italic; font-weight: 400; }
+.title-line:nth-child(3) { animation-delay: 0.3s; }
+.title-line:nth-child(4) { animation-delay: 0.4s; color: var(--accent); }
+.hero-subtitle { color: var(--text-2); font-size: 1.1rem; line-height: 1.7; margin-bottom: 2.5rem; max-width: 520px; opacity: 0; animation: fadeIn 1s 0.6s ease forwards; }
+.hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 3rem; opacity: 0; animation: fadeIn 1s 0.8s ease forwards; }
+.hero-stats { display: flex; align-items: center; gap: 2rem; opacity: 0; animation: fadeIn 1s 1s ease forwards; }
+.stat { display: flex; flex-direction: column; }
+.stat-num { font-size: 2rem; font-weight: 800; line-height: 1; color: var(--text); }
+.stat-label { font-size: 0.75rem; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.1em; font-family: var(--font-mono); }
+.stat-divider { width: 1px; height: 40px; background: var(--border); }
+.hero-visual { position: absolute; right: -50px; top: 50%; transform: translateY(-50%); z-index: 1; opacity: 0; animation: fadeIn 1.5s 1.2s ease forwards; }
+.hex-grid { position: relative; width: 480px; height: 480px; }
+.hex { position: absolute; width: 100px; height: 115px; background: var(--surface); border: 1px solid var(--border); clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-family: var(--font-mono); color: var(--text-3); transition: var(--transition); cursor: default; }
+.hex::after { content: attr(data-label); }
+.hex:hover { background: var(--surface-2); border-color: var(--accent); color: var(--accent); transform: scale(1.05); }
+.hex.center { top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--accent-dim); border-color: var(--accent); color: var(--accent); font-size: 0.8rem; font-weight: 700; }
+.hex.h1 { top: 20px; left: 50%; transform: translateX(-50%); }
+.hex.h2 { top: 90px; right: 40px; }
+.hex.h3 { bottom: 90px; right: 40px; }
+.hex.h4 { bottom: 20px; left: 50%; transform: translateX(-50%); }
+.hex.h5 { bottom: 90px; left: 40px; }
+.hex.h6 { top: 90px; left: 40px; }
+
+/* ABOUT */
+.about { padding: 8rem 0; background: var(--bg-2); }
+.about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start; }
+.about-text p { color: var(--text-2); line-height: 1.8; margin-bottom: 1.2rem; font-size: 1.05rem; }
+.about-pillars { display: flex; flex-direction: column; gap: 1.5rem; margin-top: 2rem; }
+.pillar { display: flex; gap: 1rem; align-items: flex-start; background: var(--surface); border: 1px solid var(--border); padding: 1.2rem; border-radius: var(--radius); transition: var(--transition); }
+.pillar:hover { border-color: var(--accent-dim); background: var(--surface-2); }
+.pillar-icon { font-size: 1.5rem; flex-shrink: 0; padding-top: 2px; }
+.pillar strong { display: block; font-size: 0.95rem; margin-bottom: 0.3rem; }
+.pillar p { color: var(--text-2); font-size: 0.85rem; margin: 0; line-height: 1.5; }
+.about-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 2.5rem; position: relative; overflow: hidden; }
+.about-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent), var(--blue)); }
+.card-quote { font-family: var(--font-serif); font-size: 1.2rem; font-style: italic; color: var(--text); line-height: 1.7; margin-bottom: 1rem; position: relative; padding-left: 1.5rem; }
+.quote-mark { position: absolute; left: 0; top: -0.3rem; font-size: 3rem; color: var(--accent); line-height: 1; font-style: normal; }
+.card-source { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-3); letter-spacing: 0.05em; }
+.card-divider { border: none; border-top: 1px solid var(--border); margin: 1.5rem 0; }
+.card-note { color: var(--text-2); font-size: 0.9rem; line-height: 1.6; }
+
+/* DOMAINS */
+.domains { padding: 8rem 0; }
+.domains-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+.domain-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 2rem; transition: var(--transition); position: relative; overflow: hidden; cursor: default; }
+.domain-card::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: var(--domain-color, var(--accent)); transform: scaleX(0); transform-origin: left; transition: transform 0.4s ease; }
+.domain-card:hover { transform: translateY(-4px); box-shadow: var(--shadow); border-color: var(--border-2); }
+.domain-card:hover::after { transform: scaleX(1); }
+.domain-icon { font-size: 2rem; margin-bottom: 1rem; }
+.domain-name { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; }
+.domain-desc { color: var(--text-2); font-size: 0.88rem; line-height: 1.6; margin-bottom: 1rem; }
+.domain-questions { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-3); }
+
+/* ASSESSMENT */
+.assessment { padding: 8rem 0; background: var(--bg-2); }
+.assessment-intro { display: flex; justify-content: center; }
+.intro-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 3rem; max-width: 700px; width: 100%; }
+.intro-card h3 { font-size: 1.5rem; font-weight: 700; margin-bottom: 2rem; }
+.intro-rules { list-style: none; display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2.5rem; }
+.intro-rules li { display: flex; gap: 1rem; align-items: flex-start; color: var(--text-2); font-size: 0.95rem; }
+.intro-rules li span { font-family: var(--font-mono); font-size: 0.75rem; color: var(--accent); background: var(--accent-dim); padding: 2px 8px; border-radius: 4px; flex-shrink: 0; margin-top: 2px; }
+.intro-form { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 2rem; }
+.intro-form label { font-size: 0.82rem; font-weight: 600; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.08em; font-family: var(--font-mono); }
+.intro-form input, .intro-form select { background: var(--bg); border: 1px solid var(--border-2); color: var(--text); padding: 12px 16px; border-radius: var(--radius-sm); font-family: var(--font-display); font-size: 0.95rem; width: 100%; transition: border-color 0.2s; outline: none; }
+.intro-form input:focus, .intro-form select:focus { border-color: var(--accent); }
+.intro-form select option { background: var(--bg-3); }
+
+/* QUIZ */
+.quiz-screen { max-width: 760px; margin: 0 auto; }
+.quiz-header { margin-bottom: 2.5rem; }
+.quiz-progress-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; font-size: 0.88rem; color: var(--text-2); font-family: var(--font-mono); }
+.domain-chip { background: var(--accent-dim); color: var(--accent); padding: 4px 12px; border-radius: 100px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; }
+.progress-bar-wrap { height: 4px; background: var(--surface-2); border-radius: 4px; overflow: hidden; }
+.progress-bar-fill { height: 100%; background: var(--accent); border-radius: 4px; transition: width 0.5s ease; }
+
+/* TIMER */
+.timer-row { display: flex; justify-content: flex-end; margin-bottom: 0.5rem; }
+.timer-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--font-mono); font-size: 0.78rem; font-weight: 700;
+  color: var(--text-2); background: var(--surface); border: 1px solid var(--border);
+  padding: 4px 12px; border-radius: 100px;
+  transition: color 0.3s, border-color 0.3s;
+}
+.timer-badge.urgent { color: var(--red); border-color: rgba(255,79,107,0.4); background: rgba(255,79,107,0.08); animation: timerPulse 1s ease-in-out infinite; }
+.timer-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+/* ETHICS PULSE METER */
+.pulse-meter {
+  position: fixed; right: 1.5rem; top: 50%; transform: translateY(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  z-index: 50; opacity: 0; transition: opacity 0.4s;
+}
+.pulse-meter.visible { opacity: 1; }
+.pulse-meter-label { font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.1em; writing-mode: vertical-rl; transform: rotate(180deg); margin-bottom: 4px; }
+.pulse-track { width: 8px; height: 200px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; position: relative; }
+.pulse-fill { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, var(--red), var(--orange), var(--accent)); border-radius: 10px; transition: height 0.8s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.pulse-score { font-family: var(--font-mono); font-size: 0.7rem; font-weight: 700; color: var(--accent); margin-top: 4px; }
+
+.question-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 3rem; margin-bottom: 2rem; }
+.question-number { font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-3); margin-bottom: 1.2rem; letter-spacing: 0.1em; }
+.question-text { font-size: 1.2rem; font-weight: 600; color: var(--text); line-height: 1.6; margin-bottom: 2rem; }
+.options-list { display: flex; flex-direction: column; gap: 0.75rem; }
+.option-item { display: flex; align-items: flex-start; gap: 1rem; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.1rem 1.4rem; cursor: pointer; transition: var(--transition); text-align: left; width: 100%; position: relative; overflow: hidden; }
+.option-item:hover { border-color: var(--border-2); background: var(--surface-2); }
+.option-item.selected { border-color: var(--accent); background: var(--accent-dim); }
+.option-item::before { content: ''; position: absolute; inset: 0; background: var(--accent); opacity: 0; transform: scale(0); border-radius: inherit; transition: opacity 0.4s, transform 0.4s; pointer-events: none; }
+.option-item.selected::before { opacity: 0.06; transform: scale(1); }
+.option-key { font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700; color: var(--text-3); border: 1px solid var(--border-2); width: 26px; height: 26px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border-radius: 6px; margin-top: 1px; transition: var(--transition); }
+.option-item.selected .option-key { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+.option-text { font-size: 0.95rem; color: var(--text-2); line-height: 1.5; }
+.option-item.selected .option-text { color: var(--text); }
+.quiz-nav { display: flex; justify-content: space-between; align-items: center; }
+
+/* SUMMARY */
+.summary-screen h3 { text-align: center; font-size: 1.4rem; margin-bottom: 2rem; }
+.summary-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+.summary-cell { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 0.78rem; font-weight: 600; border-radius: 10px; cursor: pointer; transition: var(--transition); border: 1px solid var(--border); }
+.summary-cell.answered { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+.summary-cell.unanswered { background: var(--surface); color: var(--text-3); }
+.summary-cell:hover { transform: scale(1.05); }
+
+/* RESULTS */
+.results { padding: 8rem 0; background: var(--bg); }
+.results-header { text-align: center; margin-bottom: 3rem; }
+.results-meta { color: var(--text-2); font-family: var(--font-mono); font-size: 0.82rem; margin-top: 0.5rem; }
+.results-overview { display: grid; grid-template-columns: 1fr 1.5fr; gap: 2rem; margin-bottom: 3rem; }
+.overall-score-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 2.5rem; display: flex; flex-direction: column; align-items: center; text-align: center; }
+.score-ring-wrap { position: relative; margin-bottom: 1.5rem; }
+.score-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.score-number { font-size: 2.5rem; font-weight: 800; color: var(--text); line-height: 1; }
+.score-label { font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-3); text-transform: uppercase; }
+.score-grade { font-size: 1.5rem; font-weight: 800; margin-bottom: 0.5rem; }
+.score-description { color: var(--text-2); font-size: 0.9rem; line-height: 1.6; }
+.radar-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 2rem; display: flex; align-items: center; justify-content: center; }
+.domain-results { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 3rem; }
+.domain-result-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.8rem; transition: var(--transition); }
+.domain-result-card:hover { border-color: var(--border-2); }
+.dr-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+.dr-icon-name { display: flex; align-items: center; gap: 10px; }
+.dr-icon { font-size: 1.3rem; }
+.dr-name { font-weight: 700; font-size: 1rem; }
+.dr-score { font-weight: 800; font-size: 1.2rem; }
+.dr-bar-wrap { height: 6px; background: var(--bg); border-radius: 4px; overflow: hidden; margin-bottom: 1rem; }
+.dr-bar { height: 100%; border-radius: 4px; transition: width 1s ease; }
+.dr-feedback { color: var(--text-2); font-size: 0.85rem; line-height: 1.6; }
+.recommendations { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 2.5rem; margin-bottom: 3rem; }
+.recommendations h3 { font-size: 1.3rem; font-weight: 700; margin-bottom: 1.5rem; }
+.rec-list { display: flex; flex-direction: column; gap: 1rem; }
+.rec-item { display: flex; gap: 1rem; align-items: flex-start; padding: 1.2rem; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); }
+.rec-tag { font-family: var(--font-mono); font-size: 0.7rem; padding: 4px 10px; border-radius: 100px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; white-space: nowrap; }
+.rec-text { color: var(--text-2); font-size: 0.9rem; line-height: 1.5; }
+.results-actions { display: flex; gap: 1rem; justify-content: center; }
+
+/* ARCHETYPE CARD */
+.archetype-card {
+  background: linear-gradient(135deg, var(--surface) 0%, var(--surface-2) 100%);
+  border: 1px solid var(--border-2);
+  border-radius: var(--radius-lg);
+  padding: 2.5rem;
+  margin-bottom: 3rem;
+  position: relative; overflow: hidden;
+  display: flex; gap: 2rem; align-items: center;
+}
+.archetype-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--purple), var(--blue));
+}
+.archetype-glyph {
+  font-size: 4rem; flex-shrink: 0;
+  filter: drop-shadow(0 0 20px rgba(232,255,71,0.3));
+  animation: archetypeGlow 3s ease-in-out infinite;
+}
+.archetype-info { flex: 1; }
+.archetype-label { font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 0.4rem; }
+.archetype-title { font-size: 1.8rem; font-weight: 800; color: var(--text); margin-bottom: 0.5rem; line-height: 1.2; }
+.archetype-title em { font-family: var(--font-serif); font-style: italic; font-weight: 400; color: var(--accent); }
+.archetype-desc { color: var(--text-2); font-size: 0.95rem; line-height: 1.7; }
+
+/* SHAREABLE CARD */
+.share-card-section { margin-bottom: 3rem; }
+.share-card-section h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 1.2rem; text-align: center; }
+.share-card-wrap { display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+#shareableCard {
+  background: linear-gradient(135deg, #0f1219 0%, #151922 50%, #0f1219 100%);
+  border: 1px solid rgba(232,255,71,0.3);
+  border-radius: var(--radius-lg);
+  padding: 2rem 2.5rem;
+  max-width: 480px; width: 100%;
+  position: relative; overflow: hidden;
+}
+#shareableCard::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(circle at 80% 20%, rgba(232,255,71,0.06) 0%, transparent 60%),
+              radial-gradient(circle at 20% 80%, rgba(79,142,255,0.06) 0%, transparent 60%);
+  pointer-events: none;
+}
+.sc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+.sc-brand { font-family: var(--font-mono); font-size: 0.75rem; color: var(--accent); letter-spacing: 0.1em; }
+.sc-date { font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-3); }
+.sc-name { font-size: 1.4rem; font-weight: 800; margin-bottom: 0.25rem; }
+.sc-archetype { font-family: var(--font-serif); font-style: italic; font-size: 1rem; color: var(--accent); margin-bottom: 1.5rem; }
+.sc-bars { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.5rem; }
+.sc-bar-row { display: flex; align-items: center; gap: 0.75rem; }
+.sc-bar-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-3); width: 80px; flex-shrink: 0; }
+.sc-bar-track { flex: 1; height: 4px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden; }
+.sc-bar-fill { height: 100%; border-radius: 4px; }
+.sc-bar-pct { font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-2); width: 32px; text-align: right; }
+.sc-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 1rem; }
+.sc-score-big { font-size: 2rem; font-weight: 800; color: var(--accent); line-height: 1; }
+.sc-score-sub { font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-3); text-transform: uppercase; margin-top: 2px; }
+.sc-grade-badge { font-size: 1.1rem; font-weight: 800; padding: 6px 14px; border-radius: 100px; }
+
+/* COPY BUTTON */
+.copy-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--surface); border: 1px solid var(--border-2);
+  color: var(--text-2); font-family: var(--font-mono); font-size: 0.78rem;
+  padding: 10px 20px; border-radius: 100px; cursor: pointer;
+  transition: var(--transition);
+}
+.copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+.copy-btn.copied { border-color: var(--teal); color: var(--teal); }
+
+/* FOOTER */
+.footer { background: var(--bg-2); border-top: 1px solid var(--border); padding: 4rem 0 2rem; }
+.footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 3rem; margin-bottom: 3rem; }
+.footer-brand p { color: var(--text-3); font-size: 0.88rem; line-height: 1.6; margin-top: 1rem; max-width: 280px; }
+.footer-links { display: flex; flex-direction: column; gap: 0.6rem; }
+.footer-links strong { font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text); font-family: var(--font-mono); margin-bottom: 0.4rem; }
+.footer-links a { color: var(--text-3); text-decoration: none; font-size: 0.88rem; transition: color 0.2s; }
+.footer-links a:hover { color: var(--accent); }
+.footer-bottom { display: flex; justify-content: space-between; align-items: center; padding-top: 1.5rem; border-top: 1px solid var(--border); font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-3); }
+
+/* RESPONSIVE */
+@media (max-width: 1024px) {
+  .hero { flex-direction: column; text-align: center; }
+  .hero-visual { display: none; }
+  .hero-actions { justify-content: center; }
+  .hero-stats { justify-content: center; }
+  .about-grid { grid-template-columns: 1fr; }
+  .domains-grid { grid-template-columns: repeat(2, 1fr); }
+  .results-overview { grid-template-columns: 1fr; }
+  .domain-results { grid-template-columns: 1fr; }
+  .footer-grid { grid-template-columns: 1fr 1fr; }
+  .pulse-meter { display: none; }
+  .archetype-card { flex-direction: column; text-align: center; }
+}
+@media (max-width: 640px) {
+  .navbar { padding: 1rem 1.5rem; }
+  .nav-links, .nav-cta { display: none; }
+  .hamburger { display: flex; }
+  .hero { padding: 6rem 1.5rem 3rem; }
+  .domains-grid { grid-template-columns: 1fr; }
+  .summary-grid { grid-template-columns: repeat(5, 1fr); }
+  .footer-grid { grid-template-columns: 1fr; }
+  .footer-bottom { flex-direction: column; gap: 0.5rem; text-align: center; }
+}
+@media print {
+  .navbar, .hero, .about, .domains, .assessment, .footer, .results-actions, .pulse-meter { display: none !important; }
+  .results { display: block !important; padding: 2rem; }
+  body { background: white; color: black; }
+}
+
+/* KEYFRAMES */
+@keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.8); } }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes shimmer { 0% { background-position: -200% center; } 100% { background-position: 200% center; } }
+@keyframes barGrow { from { width: 0; } to { width: var(--target-width); } }
+@keyframes scoreCount { from { opacity: 0; transform: scale(0.5); } to { opacity: 1; transform: scale(1); } }
+@keyframes cardFlip { 0% { opacity: 0; transform: rotateY(-15deg) translateX(-20px); } 100% { opacity: 1; transform: rotateY(0) translateX(0); } }
+@keyframes hexPulse { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
+@keyframes timerPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.04); } }
+@keyframes archetypeGlow { 0%, 100% { filter: drop-shadow(0 0 10px rgba(232,255,71,0.2)); } 50% { filter: drop-shadow(0 0 30px rgba(232,255,71,0.5)); } }
+
+.reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+.reveal.delay-1 { transition-delay: 0.1s; }
+.reveal.delay-2 { transition-delay: 0.2s; }
+.reveal.delay-3 { transition-delay: 0.3s; }
+.reveal.delay-4 { transition-delay: 0.4s; }
+.reveal.delay-5 { transition-delay: 0.5s; }
+.question-card { transition: opacity 0.25s ease, transform 0.25s ease; }
+.question-card.exiting { opacity: 0; transform: translateX(-20px); }
+.question-card.entering { animation: cardFlip 0.4s ease forwards; }
+.hex.center { animation: hexPulse 3s ease-in-out infinite; }
+.results-overview .overall-score-card { animation: fadeInUp 0.6s ease forwards; }
+.results-overview .radar-card { animation: fadeInUp 0.6s 0.2s ease both; }
+.domain-result-card { animation: fadeInUp 0.6s ease both; }
+.domain-result-card:nth-child(1) { animation-delay: 0.1s; }
+.domain-result-card:nth-child(2) { animation-delay: 0.2s; }
+.domain-result-card:nth-child(3) { animation-delay: 0.3s; }
+.domain-result-card:nth-child(4) { animation-delay: 0.4s; }
+.domain-result-card:nth-child(5) { animation-delay: 0.5s; }
+.domain-result-card:nth-child(6) { animation-delay: 0.6s; }
+.score-number { animation: scoreCount 0.8s 0.5s ease both; }
+.dr-bar { animation: barGrow 1s ease forwards; }
+.domain-card { animation: fadeInUp 0.5s ease both; }
+.domain-card:nth-child(1) { animation-delay: 0.1s; }
+.domain-card:nth-child(2) { animation-delay: 0.2s; }
+.domain-card:nth-child(3) { animation-delay: 0.3s; }
+.domain-card:nth-child(4) { animation-delay: 0.4s; }
+.domain-card:nth-child(5) { animation-delay: 0.5s; }
+.domain-card:nth-child(6) { animation-delay: 0.6s; }
+.nav-link { position: relative; }
+.nav-link::after { content: ''; position: absolute; bottom: 2px; left: 50%; width: 4px; height: 4px; background: var(--accent); border-radius: 50%; transform: translateX(-50%) scale(0); transition: transform 0.2s ease; }
+.nav-link.active::after { transform: translateX(-50%) scale(1); }
+.mobile-menu { position: fixed; top: 0; right: 0; bottom: 0; width: 280px; background: var(--bg-3); border-left: 1px solid var(--border); z-index: 200; transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); padding: 5rem 2rem 2rem; display: flex; flex-direction: column; gap: 0.5rem; }
+.mobile-menu.open { transform: translateX(0); }
+.mobile-menu a { color: var(--text-2); text-decoration: none; font-size: 1.1rem; font-weight: 600; padding: 1rem; border-radius: var(--radius-sm); transition: color 0.2s, background 0.2s; }
+.mobile-menu a:hover { color: var(--text); background: var(--surface); }
+.menu-overlay { position: fixed; inset: 0; z-index: 190; background: rgba(0,0,0,0.6); opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+.menu-overlay.open { opacity: 1; pointer-events: all; }
+</style>
+</head>
+<body>
+
+<!-- ETHICS PULSE METER (fixed sidebar) -->
+<div class="pulse-meter" id="pulseMeter">
+  <div class="pulse-meter-label">Ethics Score</div>
+  <div class="pulse-track"><div class="pulse-fill" id="pulseFill" style="height:0%"></div></div>
+  <div class="pulse-score" id="pulseScore">—</div>
+</div>
+
+<!-- NAV -->
+<nav class="navbar" id="navbar">
+  <div class="nav-brand">
+    <span class="brand-icon">⬡</span>
+    <span class="brand-name">EthosEngine</span>
+  </div>
+  <ul class="nav-links">
+    <li><a href="#home" class="nav-link active">Home</a></li>
+    <li><a href="#about" class="nav-link">About</a></li>
+    <li><a href="#domains" class="nav-link">Domains</a></li>
+    <li><a href="#assessment" class="nav-link">Assessment</a></li>
+    <li><a href="#results" class="nav-link">Results</a></li>
+  </ul>
+  <button class="btn-primary nav-cta" onclick="scrollToSection('assessment')">Start Test</button>
+  <button class="hamburger" id="hamburger" onclick="toggleMenu()">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-bg">
+    <div class="grid-overlay"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+  </div>
+  <div class="hero-content">
+    <div class="hero-badge">
+      <span class="badge-dot"></span>
+      Assessment Tool for Engineering Students
+    </div>
+    <h1 class="hero-title">
+      <span class="title-line">Where</span>
+      <span class="title-line italic">Integrity</span>
+      <span class="title-line">Meets</span>
+      <span class="title-line accent">Engineering</span>
+    </h1>
+    <p class="hero-subtitle">
+      10 powerful scenarios. 6 ethical domains. Discover your moral archetype and understand
+      where your professional ethics truly stand - in under 8 minutes.
+    </p>
+    <div class="hero-actions">
+      <button class="btn-primary" onclick="scrollToSection('assessment')">
+        Begin Assessment <span class="btn-arrow">→</span>
+      </button>
+      <button class="btn-ghost" onclick="scrollToSection('about')">Learn More</button>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><span class="stat-num">10</span><span class="stat-label">Questions</span></div>
+      <div class="stat-divider"></div>
+      <div class="stat"><span class="stat-num">6</span><span class="stat-label">Domains</span></div>
+      <div class="stat-divider"></div>
+      <div class="stat"><span class="stat-num">8</span><span class="stat-label">Minutes</span></div>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="hex-grid">
+      <div class="hex h1" data-label="Safety"></div>
+      <div class="hex h2" data-label="Honesty"></div>
+      <div class="hex h3" data-label="Accountability"></div>
+      <div class="hex h4" data-label="Sustainability"></div>
+      <div class="hex h5" data-label="Justice"></div>
+      <div class="hex h6" data-label="Competence"></div>
+      <div class="hex center" data-label="Ethics"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="about" id="about">
+  <div class="container">
+    <div class="section-tag">Why Ethics Matters</div>
+    <div class="about-grid">
+      <div class="about-text">
+        <h2 class="section-title">Engineers Shape <em>Reality</em></h2>
+        <p>Every bridge, algorithm, chemical plant, and power grid reflects decisions made by engineers. Those decisions have consequences — for lives, communities, and the planet.</p>
+        <p>The EthosEngine Assessment helps you understand where you stand on the ethical spectrum and where to grow before you face real-world dilemmas.</p>
+        <div class="about-pillars">
+          <div class="pillar">
+            <div class="pillar-icon">⚖</div>
+            <div><strong>IEEE & NSPE Aligned</strong><p>Questions grounded in internationally recognized engineering ethics codes.</p></div>
+          </div>
+          <div class="pillar">
+            <div class="pillar-icon">🔬</div>
+            <div><strong>Evidence-Based Scenarios</strong><p>Real-world dilemmas that simulate actual professional pressure points.</p></div>
+          </div>
+          <div class="pillar">
+            <div class="pillar-icon">🧬</div>
+            <div><strong>Ethics Archetype</strong><p>Discover your unique moral profile — from Guardian to Pragmatist to Trailblazer.</p></div>
+          </div>
+        </div>
+      </div>
+      <div class="about-card">
+        <div class="card-quote">
+          <span class="quote-mark">"</span>
+          Engineers shall hold paramount the safety, health, and welfare of the public in the performance of their professional duties.
+        </div>
+        <div class="card-source">— NSPE Code of Ethics, Fundamental Canon I</div>
+        <div class="card-divider"></div>
+        <div class="card-note">This assessment helps you internalize such principles before they become professional imperatives.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DOMAINS -->
+<section class="domains" id="domains">
+  <div class="container">
+    <div class="section-tag">Assessment Domains</div>
+    <h2 class="section-title centered">Six Pillars of <em>Professional Ethics</em></h2>
+    <p class="section-subtitle">Your responses are scored across these six dimensions of engineering ethics.</p>
+    <div class="domains-grid" id="domains-grid"></div>
+  </div>
+</section>
+
+<!-- ASSESSMENT -->
+<section class="assessment" id="assessment">
+  <div class="container">
+    <div class="section-tag">Interactive Assessment</div>
+    <h2 class="section-title centered">The <em>Ethics Test</em></h2>
+
+    <!-- INTRO SCREEN -->
+    <div class="assessment-intro" id="assessment-intro">
+      <div class="intro-card">
+        <h3>Before You Begin</h3>
+        <ul class="intro-rules">
+          <li><span>01</span> Answer honestly — there are no "correct" answers, only authentic ones.</li>
+          <li><span>02</span> Each scenario is drawn from real engineering situations.</li>
+          <li><span>03</span> 10 questions · estimated 6–10 minutes to complete.</li>
+          <li><span>04</span> Your results are private and processed in your browser only.</li>
+        </ul>
+        <div class="intro-form">
+          <label>Your Name (optional)</label>
+          <input type="text" id="student-name" placeholder="e.g., Priya Sharma" />
+          <label>Field of Engineering</label>
+          <select id="engineering-field">
+            <option value="">Select your discipline</option>
+            <option>Civil Engineering</option>
+            <option>Mechanical Engineering</option>
+            <option>Electrical Engineering</option>
+            <option>Computer Science / Software Engineering</option>
+            <option>Chemical Engineering</option>
+            <option>Environmental Engineering</option>
+            <option>Aerospace Engineering</option>
+            <option>Biomedical Engineering</option>
+            <option>Industrial Engineering</option>
+            <option>Other</option>
+          </select>
+          <label>Year of Study</label>
+          <select id="study-year">
+            <option value="">Select year</option>
+            <option>1st Year</option>
+            <option>2nd Year</option>
+            <option>3rd Year</option>
+            <option>4th Year</option>
+            <option>Postgraduate</option>
+            <option>Working Professional</option>
+          </select>
+        </div>
+        <button class="btn-primary large" onclick="startAssessment()">
+          Start Assessment <span class="btn-arrow">→</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- QUIZ SCREEN -->
+    <div class="quiz-screen hidden" id="quiz-screen">
+      <div class="quiz-header">
+        <div class="timer-row">
+          <div class="timer-badge" id="timer-badge">
+            <div class="timer-dot"></div>
+            <span id="timer-display">2:00</span>
+          </div>
+        </div>
+        <div class="quiz-progress-info">
+          <span id="q-counter">Question 1 of 10</span>
+          <span id="q-domain-label" class="domain-chip">Safety</span>
+        </div>
+        <div class="progress-bar-wrap">
+          <div class="progress-bar-fill" id="progress-bar"></div>
+        </div>
+      </div>
+      <div class="question-card" id="question-card">
+        <div class="question-number" id="q-number">01</div>
+        <div class="question-text" id="q-text"></div>
+        <div class="options-list" id="options-list"></div>
+      </div>
+      <div class="quiz-nav">
+        <button class="btn-ghost" onclick="prevQuestion()" id="btn-prev">← Previous</button>
+        <button class="btn-primary" onclick="nextQuestion()" id="btn-next">Next →</button>
+      </div>
+    </div>
+
+    <!-- SUMMARY SCREEN -->
+    <div class="summary-screen hidden" id="summary-screen">
+      <h3>Almost done! Review your answers before submitting.</h3>
+      <div class="summary-grid" id="summary-grid"></div>
+      <div style="text-align:center; margin-top: 2rem;">
+        <button class="btn-ghost" onclick="goBack()">← Go Back</button>
+        <button class="btn-primary large" onclick="submitAssessment()">Submit & See Results →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RESULTS -->
+<section class="results hidden" id="results">
+  <div class="container">
+    <div class="section-tag">Your Results</div>
+    <div class="results-header">
+      <h2 class="section-title">Ethics Profile: <em id="result-name">Student</em></h2>
+      <p id="result-field-year" class="results-meta"></p>
+    </div>
+
+    <!-- ARCHETYPE CARD -->
+    <div class="archetype-card" id="archetype-card">
+      <div class="archetype-glyph" id="archetype-glyph">🛡️</div>
+      <div class="archetype-info">
+        <div class="archetype-label">// Your Ethics Archetype</div>
+        <div class="archetype-title" id="archetype-title">The <em>Guardian</em></div>
+        <div class="archetype-desc" id="archetype-desc">Loading your archetype...</div>
+      </div>
+    </div>
+
+    <div class="results-overview">
+      <div class="overall-score-card">
+        <div class="score-ring-wrap">
+          <canvas id="score-ring" width="180" height="180"></canvas>
+          <div class="score-center">
+            <div class="score-number" id="overall-score">0</div>
+            <div class="score-label">Overall</div>
+          </div>
+        </div>
+        <div class="score-grade" id="score-grade"></div>
+        <div class="score-description" id="score-description"></div>
+      </div>
+      <div class="radar-card">
+        <canvas id="radar-chart" width="400" height="400"></canvas>
+      </div>
+    </div>
+
+    <div class="domain-results" id="domain-results"></div>
+    <div class="recommendations" id="recommendations"></div>
+
+    <!-- SHAREABLE CARD -->
+    <div class="share-card-section">
+      <h3>📤 Your Ethics Card</h3>
+      <div class="share-card-wrap">
+        <div id="shareableCard">
+          <div class="sc-header">
+            <span class="sc-brand">⬡ ETHOS ENGINE</span>
+            <span class="sc-date" id="sc-date"></span>
+          </div>
+          <div class="sc-name" id="sc-name">Student</div>
+          <div class="sc-archetype" id="sc-archetype">Ethics Archetype</div>
+          <div class="sc-bars" id="sc-bars"></div>
+          <div class="sc-footer">
+            <div>
+              <div class="sc-score-big" id="sc-score">—</div>
+              <div class="sc-score-sub">Overall Score</div>
+            </div>
+            <div class="sc-grade-badge" id="sc-grade-badge"></div>
+          </div>
+        </div>
+        <button class="copy-btn" id="copyBtn" onclick="copyResultsText()">
+          📋 Copy Results Summary
+        </button>
+      </div>
+    </div>
+
+    <div class="results-actions">
+      <button class="btn-primary" onclick="window.print()">🖨 Print Report</button>
+      <button class="btn-ghost" onclick="retakeAssessment()">↺ Retake Assessment</button>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <span class="brand-icon">⬡</span>
+        <span class="brand-name">EthosEngine</span>
+        <p>A professional ethics assessment tool designed for the next generation of engineers.</p>
+      </div>
+      <div class="footer-links">
+        <strong>Navigate</strong>
+        <a href="#home">Home</a>
+        <a href="#about">About</a>
+        <a href="#domains">Domains</a>
+        <a href="#assessment">Assessment</a>
+      </div>
+      <div class="footer-links">
+        <strong>References</strong>
+        <a href="#">IEEE Code of Ethics</a>
+        <a href="#">NSPE Code of Ethics</a>
+        <a href="#">ASCE Ethics Policy</a>
+        <a href="#">ACM Code of Ethics</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 EthosEngine. Built for engineering students.</span>
+      <span>No data is stored or transmitted.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ===================== DATA =====================
+const DOMAINS = [
+  { id: "safety",         name: "Public Safety & Welfare",        icon: "🛡️", color: "#ff4f6b", description: "Prioritizing human life, health, and safety in engineering decisions — even at personal or organizational cost.", questionCount: 2 },
+  { id: "honesty",        name: "Honesty & Integrity",            icon: "⚖️", color: "#4f8eff", description: "Being truthful in technical reporting, refusing to falsify data, and maintaining professional transparency.", questionCount: 2 },
+  { id: "accountability", name: "Accountability & Responsibility", icon: "🎯", color: "#e8ff47", description: "Owning mistakes, acknowledging limitations, and taking responsibility for outcomes of engineering work.", questionCount: 2 },
+  { id: "sustainability", name: "Environmental Sustainability",    icon: "🌱", color: "#2ee8c4", description: "Considering long-term environmental consequences and championing sustainable engineering practices.", questionCount: 1 },
+  { id: "justice",        name: "Social Justice & Fairness",      icon: "🤝", color: "#a77bff", description: "Ensuring engineering work does not discriminate, and actively considers equity and social impact.", questionCount: 2 },
+  { id: "competence",     name: "Professional Competence",        icon: "🔧", color: "#ff8c42", description: "Practicing only within areas of expertise, committing to lifelong learning, and maintaining technical standards.", questionCount: 1 }
+];
+
+const QUESTIONS = [
+  {
+    id: 1, domain: "safety",
+    text: "You are a structural engineer reviewing a highway bridge design. You find a flaw that could fail under heavy load. Your manager calls it 'within acceptable risk' and urges you to sign off to avoid delays. What do you do?",
+    options: [
+      { key: "A", text: "Refuse to sign off and formally document your concerns, escalating to a safety officer if needed.", score: 4 },
+      { key: "B", text: "Request a second opinion from another licensed engineer before deciding.", score: 3 },
+      { key: "C", text: "Sign off but verbally notify your manager again, trusting their judgment.", score: 2 },
+      { key: "D", text: "Sign off to avoid conflict — your manager has more experience.", score: 1 }
+    ]
+  },
+  {
+    id: 2, domain: "safety",
+    text: "You are a software engineer at a medical device company. A life-support firmware bug is found in already-deployed devices. Your team lead says 'patch it quietly' in the next update. What is your response?",
+    options: [
+      { key: "A", text: "Insist on immediate disclosure to the FDA and affected hospitals, regardless of cost.", score: 4 },
+      { key: "B", text: "Push for an urgent internal risk assessment before deciding on disclosure.", score: 3 },
+      { key: "C", text: "Agree with the quiet patch but request the fix be released as quickly as possible.", score: 2 },
+      { key: "D", text: "Leave it entirely to management — it is above your pay grade.", score: 1 }
+    ]
+  },
+  {
+    id: 3, domain: "honesty",
+    text: "You realize a design decision you championed caused a 30% cost overrun. Your manager asks you to frame it as an 'unforeseen external cost' in the leadership presentation. What do you do?",
+    options: [
+      { key: "A", text: "Politely but firmly decline and offer to present the accurate picture with lessons learned.", score: 4 },
+      { key: "B", text: "Ask to review the presentation and suggest more accurate language before it goes out.", score: 3 },
+      { key: "C", text: "Go along this time but resolve to be more vocal next time.", score: 2 },
+      { key: "D", text: "Follow your manager's directive — managing optics is part of leadership.", score: 1 }
+    ]
+  },
+  {
+    id: 4, domain: "honesty",
+    text: "A client asks for a feasibility assessment. Your honest view is that the project is not feasible, but saying so will cost your firm the contract. What do you tell the client?",
+    options: [
+      { key: "A", text: "Provide a complete and honest assessment, clearly stating the infeasibility and your reasons.", score: 4 },
+      { key: "B", text: "Highlight major concerns honestly while offering alternative approaches that might be feasible.", score: 3 },
+      { key: "C", text: "Present the assessment ambiguously, leaving room for the client to interpret optimistically.", score: 2 },
+      { key: "D", text: "Provide a positive assessment — your firm needs the contract and the client seems committed.", score: 1 }
+    ]
+  },
+  {
+    id: 5, domain: "accountability",
+    text: "Your team deployed a software update that caused 4 hours of downtime due to a configuration error you made. In the post-incident report, how do you handle your role?",
+    options: [
+      { key: "A", text: "Clearly acknowledge your mistake, explain what happened, and propose process changes to prevent recurrence.", score: 4 },
+      { key: "B", text: "Acknowledge the error but frame it within broader team and process failures.", score: 3 },
+      { key: "C", text: "Mention the error briefly without drawing too much attention to your role.", score: 2 },
+      { key: "D", text: "Report the root cause as 'insufficient testing protocols' — technically true and less personal.", score: 1 }
+    ]
+  },
+  {
+    id: 6, domain: "accountability",
+    text: "Midway through a design project outside your expertise, you realize you're in over your head — and deliverables are due next week. What do you do?",
+    options: [
+      { key: "A", text: "Come clean to the client, involve a qualified expert, and renegotiate the timeline if needed.", score: 4 },
+      { key: "B", text: "Urgently consult a qualified colleague and clearly co-credit them in the deliverable.", score: 3 },
+      { key: "C", text: "Submit your best work and hope it meets standards — you've done your best to learn.", score: 2 },
+      { key: "D", text: "Submit on time regardless of quality — missing a deadline is worse than an imperfect deliverable.", score: 1 }
+    ]
+  },
+  {
+    id: 7, domain: "sustainability",
+    text: "You are designing a manufacturing plant. The cheapest design meets legal effluent limits but is known to bioaccumulate in local waterways over decades. A cleaner design costs more. What do you propose?",
+    options: [
+      { key: "A", text: "Propose the cleaner design and present a life-cycle cost analysis that justifies the investment.", score: 4 },
+      { key: "B", text: "Present both options transparently with full environmental impact data for each.", score: 3 },
+      { key: "C", text: "Use the cheaper design since it meets all legal requirements.", score: 2 },
+      { key: "D", text: "Use the cheaper design — long-term environmental modeling is speculative.", score: 1 }
+    ]
+  },
+  {
+    id: 8, domain: "justice",
+    text: "You are developing an AI hiring tool. During testing you discover it statistically disadvantages applicants from certain ethnic backgrounds. The client is eager to deploy. What do you do?",
+    options: [
+      { key: "A", text: "Halt deployment, inform the client clearly, and refuse to deploy until the bias is resolved.", score: 4 },
+      { key: "B", text: "Document the bias in writing, recommend delay, and offer a remediation plan.", score: 3 },
+      { key: "C", text: "Deploy with a flag to the client that the system 'may need monitoring' without specifying the bias.", score: 2 },
+      { key: "D", text: "Deploy on schedule — biases in hiring tools are common and this is ultimately the client's problem.", score: 1 }
+    ]
+  },
+  {
+    id: 9, domain: "justice",
+    text: "Budget pressure leads stakeholders to propose cutting accessibility features from a public building, arguing 'only a small percentage of users need them.' How do you respond?",
+    options: [
+      { key: "A", text: "Strongly push back — accessibility is a right, not optional — and outline legal and ethical obligations.", score: 4 },
+      { key: "B", text: "Negotiate to maintain the most critical accessibility features and document trade-offs formally.", score: 3 },
+      { key: "C", text: "Accept the cuts but recommend revisiting them in a future renovation.", score: 2 },
+      { key: "D", text: "Agree with the cuts — engineering decisions must reflect the needs of the majority.", score: 1 }
+    ]
+  },
+  {
+    id: 10, domain: "competence",
+    text: "A client offers a large contract requiring specialized seismic engineering expertise. Your team has none. Your manager wants to 'learn as you go.' What do you advise?",
+    options: [
+      { key: "A", text: "Advise against accepting unless a qualified seismic engineering consultant is brought in as a key team member.", score: 4 },
+      { key: "B", text: "Accept only if adequate training time and specialist peer review are built into the contract.", score: 3 },
+      { key: "C", text: "Accept the contract — your team is generally competent and can figure it out.", score: 2 },
+      { key: "D", text: "Accept — every project involves learning and specialization is overrated.", score: 1 }
+    ]
+  }
+];
+
+const GRADE_THRESHOLDS = [
+  { min: 90, grade: "A+", label: "Exemplary Ethicist",           color: "#2ee8c4", description: "Your ethical reasoning is outstanding. You consistently prioritize principles over convenience. You are ready to be a moral anchor in any engineering team." },
+  { min: 80, grade: "A",  label: "Strong Ethical Foundation",    color: "#4f8eff", description: "You demonstrate very strong ethical awareness and principled decision-making. With continued reflection, you will be an ethical leader in your field." },
+  { min: 70, grade: "B+", label: "Developing Ethicist",          color: "#e8ff47", description: "Good ethical baseline with some areas for growth. You weigh principles seriously, but occasionally let practical pressures cloud your judgement." },
+  { min: 60, grade: "B",  label: "Moderate Ethical Awareness",   color: "#ff8c42", description: "You have a foundational ethical sense, but some blind spots exist. You would benefit from structured ethics training and case-study practice." },
+  { min: 50, grade: "C",  label: "Ethics in Progress",           color: "#a77bff", description: "Your ethical reasoning is inconsistent. You often default to convenience or authority rather than principle. Now is the time to build stronger foundations." },
+  { min: 0,  grade: "D",  label: "Needs Significant Development",color: "#ff4f6b", description: "Significant gaps in professional ethics awareness. Seek dedicated ethics coursework and mentorship before entering professional practice." }
+];
+
+// Ethics Archetypes — based on score + dominant domain pattern
+const ARCHETYPES = [
+  {
+    id: "guardian",
+    glyph: "🛡️",
+    title: "The Guardian",
+    desc: "You are a principled protector. Safety and honesty come first — always — even when it costs you. In any team, you are the moral compass others quietly rely on. Your strength: holding the line when it matters most.",
+    match: (scores, overall) => scores.safety >= 70 && scores.honesty >= 70
+  },
+  {
+    id: "steward",
+    glyph: "🌿",
+    title: "The Steward",
+    desc: "You think beyond today. Sustainability and justice shape how you design and decide. You are rare — an engineer who genuinely weighs future generations in present calculations. Your strength: long-horizon thinking.",
+    match: (scores, overall) => scores.sustainability >= 70 && scores.justice >= 70
+  },
+  {
+    id: "pragmatist",
+    glyph: "⚙️",
+    title: "The Pragmatist",
+    desc: "You balance principles with reality. You navigate competing pressures with good judgment — not always ideally, but thoughtfully. You understand that ethics often play out in grey zones. Your strength: adaptable and realistic.",
+    match: (scores, overall) => overall >= 55 && overall < 75
+  },
+  {
+    id: "trailblazer",
+    glyph: "🔥",
+    title: "The Trailblazer",
+    desc: "You are exceptionally principled across every domain. You don't just follow ethics codes — you embody them. Others look to you as a benchmark of what professional integrity looks like. Your strength: consistent, courageous, and complete.",
+    match: (scores, overall) => overall >= 85
+  },
+  {
+    id: "learner",
+    glyph: "🌱",
+    title: "The Learner",
+    desc: "You are at the start of an important journey. You have foundational instincts but haven't yet sharpened them under pressure. Every great ethical engineer started here — the difference is choosing to grow. Your strength: the potential is all there.",
+    match: (scores, overall) => overall < 55
+  },
+  {
+    id: "advocate",
+    glyph: "🤝",
+    title: "The Advocate",
+    desc: "Fairness and accountability define you. You see engineering as a social act with real human consequences. You speak up for those affected, own your mistakes, and demand the same from others. Your strength: moral courage.",
+    match: (scores, overall) => scores.justice >= 70 && scores.accountability >= 70
+  }
+];
+
+const DOMAIN_FEEDBACK = {
+  safety:         { high: "Excellent. You prioritize public safety as paramount, even under pressure.", mid: "Your safety commitment is good but sometimes conditional. Build unconditional safety reflexes.", low: "Safety awareness needs development. Review NSPE Canon I and practice safety-critical scenarios." },
+  honesty:        { high: "Strong integrity. You refuse to distort technical truth even when it costs you.", mid: "Generally honest but susceptible to social pressure. Practice articulating uncomfortable truths.", low: "Honesty gaps present. Consider long-term reputational and legal consequences of misrepresentation." },
+  accountability: { high: "Exemplary accountability. You own decisions and failures, using them constructively.", mid: "You accept responsibility when prompted but sometimes diffuse blame. Practice proactive ownership.", low: "Accountability underdeveloped. Start by practicing honest post-mortems on small projects." },
+  sustainability: { high: "You take a genuinely holistic view of engineering impact. Ahead of your peers.", mid: "Environmental awareness is emerging but often takes a back seat to compliance.", low: "Sustainability thinking needs to develop. Engineering ethics requires multi-generational thinking." },
+  justice:        { high: "Your commitment to fairness and equity is commendable. You see engineering as a social act.", mid: "You acknowledge social justice dimensions but stop short of advocacy.", low: "Social justice awareness is limited. Explore how engineering decisions perpetuate or combat inequality." },
+  competence:     { high: "Strong commitment to competence. You respect the limits of your expertise.", mid: "Competence awareness is good but you occasionally overextend. Set clearer expertise boundaries.", low: "Professional competence standards need reinforcement. Staying in your lane is a core ethical obligation." }
+};
+
+// ===================== STATE =====================
+let currentQuestion = 0;
+let answers = {};
+let questionTimer = null;
+let timerSeconds = 0;
+const QUESTION_TIME = 120; // 2 minutes per question
+
+// ===================== ASSESSMENT =====================
+function startAssessment() {
+  const name = document.getElementById('student-name').value.trim();
+  const field = document.getElementById('engineering-field').value;
+  const year  = document.getElementById('study-year').value;
+  window.userInfo = { name, field, year };
+  currentQuestion = 0;
+  answers = {};
+
+  document.getElementById('assessment-intro').classList.add('hidden');
+  document.getElementById('quiz-screen').classList.remove('hidden');
+  document.getElementById('pulseMeter').classList.add('visible');
+  renderQuestion(0);
+}
+
+function renderQuestion(index) {
+  const q = QUESTIONS[index];
+  const domain = DOMAINS.find(d => d.id === q.domain);
+
+  const progress = ((index + 1) / QUESTIONS.length) * 100;
+  document.getElementById('progress-bar').style.width = progress + '%';
+  document.getElementById('q-counter').textContent = `Question ${index + 1} of ${QUESTIONS.length}`;
+  document.getElementById('q-number').textContent = String(index + 1).padStart(2, '0');
+  document.getElementById('q-domain-label').textContent = domain.name;
+  document.getElementById('q-domain-label').style.background = domain.color + '22';
+  document.getElementById('q-domain-label').style.color = domain.color;
+  document.getElementById('q-text').textContent = q.text;
+
+  const optionsList = document.getElementById('options-list');
+  optionsList.innerHTML = '';
+  q.options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'option-item' + (answers[q.id] === opt.score ? ' selected' : '');
+    btn.innerHTML = `<span class="option-key">${opt.key}</span><span class="option-text">${opt.text}</span>`;
+    btn.onclick = () => selectOption(q.id, opt.score, btn);
+    optionsList.appendChild(btn);
+  });
+
+  document.getElementById('btn-prev').style.visibility = index === 0 ? 'hidden' : 'visible';
+  document.getElementById('btn-next').textContent = index === QUESTIONS.length - 1 ? 'Review Answers →' : 'Next →';
+
+  const card = document.getElementById('question-card');
+  card.classList.remove('entering');
+  void card.offsetWidth;
+  card.classList.add('entering');
+
+  startTimer();
+}
+
+function selectOption(questionId, score, clickedBtn) {
+  document.querySelectorAll('.option-item').forEach(b => b.classList.remove('selected'));
+  clickedBtn.classList.add('selected');
+  answers[questionId] = score;
+  updatePulseMeter();
+}
+
+function nextQuestion() {
+  const q = QUESTIONS[currentQuestion];
+  if (!answers[q.id] && answers[q.id] !== 0) {
+    showToast('Please select an answer to continue.', 'warning');
+    return;
+  }
+  if (currentQuestion < QUESTIONS.length - 1) {
+    currentQuestion++;
+    renderQuestion(currentQuestion);
+  } else {
+    showSummary();
+  }
+}
+
+function prevQuestion() {
+  if (currentQuestion > 0) {
+    currentQuestion--;
+    renderQuestion(currentQuestion);
+  }
+}
+
+function showSummary() {
+  clearTimer();
+  document.getElementById('quiz-screen').classList.add('hidden');
+  document.getElementById('summary-screen').classList.remove('hidden');
+  const grid = document.getElementById('summary-grid');
+  grid.innerHTML = '';
+  QUESTIONS.forEach((q, i) => {
+    const cell = document.createElement('div');
+    const isAnswered = answers[q.id] !== undefined;
+    cell.className = `summary-cell ${isAnswered ? 'answered' : 'unanswered'}`;
+    cell.textContent = String(i + 1).padStart(2, '0');
+    cell.title = isAnswered ? 'Answered' : 'Not answered';
+    cell.onclick = () => jumpToQuestion(i);
+    grid.appendChild(cell);
+  });
+}
+
+function jumpToQuestion(index) {
+  document.getElementById('summary-screen').classList.add('hidden');
+  document.getElementById('quiz-screen').classList.remove('hidden');
+  currentQuestion = index;
+  renderQuestion(index);
+}
+
+function goBack() {
+  document.getElementById('summary-screen').classList.add('hidden');
+  document.getElementById('quiz-screen').classList.remove('hidden');
+  renderQuestion(currentQuestion);
+}
+
+function submitAssessment() {
+  const unanswered = QUESTIONS.filter(q => answers[q.id] === undefined);
+  if (unanswered.length > 0) {
+    showToast(`${unanswered.length} question(s) unanswered. Please complete all.`, 'warning');
+    return;
+  }
+  document.getElementById('summary-screen').classList.add('hidden');
+  document.getElementById('pulseMeter').classList.remove('visible');
+  buildResults();
+  const resultsSection = document.getElementById('results');
+  resultsSection.classList.remove('hidden');
+  setTimeout(() => resultsSection.scrollIntoView({ behavior: 'smooth' }), 200);
+}
+
+function retakeAssessment() {
+  answers = {};
+  currentQuestion = 0;
+  clearTimer();
+  document.getElementById('results').classList.add('hidden');
+  document.getElementById('quiz-screen').classList.add('hidden');
+  document.getElementById('summary-screen').classList.add('hidden');
+  document.getElementById('assessment-intro').classList.remove('hidden');
+  document.getElementById('pulseMeter').classList.remove('visible');
+  scrollToSection('assessment');
+}
+
+// ===================== TIMER =====================
+function startTimer() {
+  clearTimer();
+  timerSeconds = QUESTION_TIME;
+  updateTimerDisplay();
+  questionTimer = setInterval(() => {
+    timerSeconds--;
+    updateTimerDisplay();
+    if (timerSeconds <= 0) {
+      clearTimer();
+      // Auto-advance if no answer, or prompt
+      showToast("Time's up for this question! Moving on.", 'warning');
+      setTimeout(() => {
+        if (currentQuestion < QUESTIONS.length - 1) {
+          currentQuestion++;
+          renderQuestion(currentQuestion);
+        } else {
+          showSummary();
+        }
+      }, 800);
+    }
+  }, 1000);
+}
+
+function clearTimer() {
+  if (questionTimer) { clearInterval(questionTimer); questionTimer = null; }
+}
+
+function updateTimerDisplay() {
+  const m = Math.floor(timerSeconds / 60);
+  const s = timerSeconds % 60;
+  const display = `${m}:${String(s).padStart(2, '0')}`;
+  const badge = document.getElementById('timer-badge');
+  const disp = document.getElementById('timer-display');
+  if (disp) disp.textContent = display;
+  if (badge) {
+    badge.classList.toggle('urgent', timerSeconds <= 30);
+  }
+}
+
+// ===================== PULSE METER =====================
+function updatePulseMeter() {
+  const answered = Object.keys(answers).length;
+  if (answered === 0) return;
+  let total = 0, maxPossible = 0, minPossible = 0;
+  QUESTIONS.forEach(q => {
+    if (answers[q.id] !== undefined) {
+      total += answers[q.id];
+      maxPossible += 4;
+      minPossible += 1;
+    }
+  });
+  const pct = Math.round(((total - minPossible) / (maxPossible - minPossible)) * 100);
+  document.getElementById('pulseFill').style.height = pct + '%';
+  document.getElementById('pulseScore').textContent = pct + '%';
+}
+
+// ===================== RESULTS =====================
+function buildResults() {
+  const { name, field, year } = window.userInfo || {};
+  document.getElementById('result-name').textContent = name || 'Student';
+  const meta = [field, year].filter(Boolean).join(' · ');
+  document.getElementById('result-field-year').textContent = meta;
+
+  // Domain scores
+  const domainScores = {};
+  DOMAINS.forEach(d => { domainScores[d.id] = { total: 0, count: 0 }; });
+  QUESTIONS.forEach(q => {
+    const score = answers[q.id] || 0;
+    domainScores[q.domain].total += score;
+    domainScores[q.domain].count++;
+  });
+  const domainPct = {};
+  DOMAINS.forEach(d => {
+    const ds = domainScores[d.id];
+    const maxP = ds.count * 4;
+    const minP = ds.count * 1;
+    domainPct[d.id] = ds.count > 0 ? Math.round(((ds.total - minP) / (maxP - minP)) * 100) : 0;
+  });
+
+  const allScores = Object.values(domainPct);
+  const overall = Math.round(allScores.reduce((a, b) => a + b, 0) / allScores.length);
+
+  // Grade
+  const gradeInfo = GRADE_THRESHOLDS.find(g => overall >= g.min);
+  document.getElementById('overall-score').textContent = overall + '%';
+  document.getElementById('score-grade').textContent = `${gradeInfo.grade} — ${gradeInfo.label}`;
+  document.getElementById('score-grade').style.color = gradeInfo.color;
+  document.getElementById('score-description').textContent = gradeInfo.description;
+
+  // Archetype
+  const archetype = ARCHETYPES.find(a => a.match(domainPct, overall)) || ARCHETYPES[2];
+  document.getElementById('archetype-glyph').textContent = archetype.glyph;
+  document.getElementById('archetype-title').innerHTML = `The <em>${archetype.title.replace('The ', '')}</em>`;
+  document.getElementById('archetype-desc').textContent = archetype.desc;
+
+  // Score ring
+  drawScoreRing(overall, gradeInfo.color);
+
+  // Radar
+  drawRadar(domainPct);
+
+  // Domain cards
+  renderDomainResults(domainPct);
+
+  // Recommendations
+  renderRecommendations(domainPct);
+
+  // Shareable card
+  buildShareCard(name, archetype, domainPct, overall, gradeInfo);
+}
+
+function drawScoreRing(pct, color) {
+  const canvas = document.getElementById('score-ring');
+  const ctx = canvas.getContext('2d');
+  const cx = 90, cy = 90, r = 75, lw = 12;
+  ctx.clearRect(0, 0, 180, 180);
+  ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.strokeStyle = 'rgba(255,255,255,0.06)'; ctx.lineWidth = lw; ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, -Math.PI / 2, (-Math.PI / 2) + (Math.PI * 2 * pct / 100));
+  ctx.strokeStyle = color; ctx.lineWidth = lw; ctx.lineCap = 'round'; ctx.stroke();
+}
+
+function drawRadar(domainPct) {
+  const canvas = document.getElementById('radar-chart');
+  const ctx = canvas.getContext('2d');
+  const w = 400, h = 400, cx = 200, cy = 210, R = 155;
+  ctx.clearRect(0, 0, w, h);
+  const labels = DOMAINS.map(d => d.name.split(' ')[0]);
+  const values = DOMAINS.map(d => domainPct[d.id] / 100);
+  const colors = DOMAINS.map(d => d.color);
+  const n = DOMAINS.length;
+  const angle = (i) => (Math.PI * 2 * i / n) - Math.PI / 2;
+
+  // Grid
+  for (let level = 1; level <= 5; level++) {
+    const rad = R * level / 5;
+    ctx.beginPath();
+    for (let i = 0; i < n; i++) {
+      const x = cx + rad * Math.cos(angle(i));
+      const y = cy + rad * Math.sin(angle(i));
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.strokeStyle = 'rgba(255,255,255,0.06)'; ctx.lineWidth = 1; ctx.stroke();
+  }
+  // Axes
+  for (let i = 0; i < n; i++) {
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(cx + R * Math.cos(angle(i)), cy + R * Math.sin(angle(i)));
+    ctx.strokeStyle = 'rgba(255,255,255,0.08)'; ctx.lineWidth = 1; ctx.stroke();
+  }
+  // Data polygon
+  ctx.beginPath();
+  for (let i = 0; i < n; i++) {
+    const x = cx + R * values[i] * Math.cos(angle(i));
+    const y = cy + R * values[i] * Math.sin(angle(i));
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  }
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(232,255,71,0.08)'; ctx.fill();
+  ctx.strokeStyle = 'rgba(232,255,71,0.6)'; ctx.lineWidth = 2; ctx.stroke();
+  // Dots
+  for (let i = 0; i < n; i++) {
+    const x = cx + R * values[i] * Math.cos(angle(i));
+    const y = cy + R * values[i] * Math.sin(angle(i));
+    ctx.beginPath(); ctx.arc(x, y, 5, 0, Math.PI * 2);
+    ctx.fillStyle = colors[i]; ctx.fill();
+  }
+  // Labels
+  ctx.font = '600 11px Syne, sans-serif';
+  ctx.textAlign = 'center';
+  for (let i = 0; i < n; i++) {
+    const lx = cx + (R + 26) * Math.cos(angle(i));
+    const ly = cy + (R + 26) * Math.sin(angle(i));
+    ctx.fillStyle = 'rgba(240,242,248,0.7)';
+    ctx.fillText(labels[i], lx, ly + 4);
+  }
+}
+
+function renderDomainResults(domainPct) {
+  const container = document.getElementById('domain-results');
+  container.innerHTML = '';
+  DOMAINS.forEach((d, i) => {
+    const pct = domainPct[d.id];
+    const fb = pct >= 70 ? DOMAIN_FEEDBACK[d.id].high : pct >= 45 ? DOMAIN_FEEDBACK[d.id].mid : DOMAIN_FEEDBACK[d.id].low;
+    const card = document.createElement('div');
+    card.className = 'domain-result-card';
+    card.innerHTML = `
+      <div class="dr-header">
+        <div class="dr-icon-name"><span class="dr-icon">${d.icon}</span><span class="dr-name">${d.name}</span></div>
+        <span class="dr-score" style="color:${d.color}">${pct}%</span>
+      </div>
+      <div class="dr-bar-wrap">
+        <div class="dr-bar" style="width:${pct}%;background:${d.color};--target-width:${pct}%"></div>
+      </div>
+      <div class="dr-feedback">${fb}</div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function renderRecommendations(domainPct) {
+  const container = document.getElementById('recommendations');
+  const sorted = DOMAINS.map(d => ({ ...d, pct: domainPct[d.id] })).sort((a, b) => a.pct - b.pct);
+  const recs = [
+    { domain: sorted[0], tag: "Priority Focus", tagColor: "#ff4f6b", text: getRecommendation(sorted[0].id, 'priority') },
+    { domain: sorted[1], tag: "Recommended Growth", tagColor: "#ff8c42", text: getRecommendation(sorted[1].id, 'growth') },
+    { domain: sorted[sorted.length - 1], tag: "Strength to Build On", tagColor: "#2ee8c4", text: getRecommendation(sorted[sorted.length - 1].id, 'strength') }
+  ];
+  container.innerHTML = `
+    <h3>📋 Personalised Recommendations</h3>
+    <div class="rec-list">
+      ${recs.map(r => `
+        <div class="rec-item">
+          <span class="rec-tag" style="background:${r.tagColor}22;color:${r.tagColor};border:1px solid ${r.tagColor}44">${r.tag}</span>
+          <span class="rec-text"><strong>${r.domain.icon} ${r.domain.name}:</strong> ${r.text}</span>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function getRecommendation(domainId, type) {
+  const recs = {
+    safety:         { priority: "Study the Challenger and Columbia disaster case studies. Practice articulating safety concerns using formal risk matrices. Join an NSPE student chapter.", growth: "Review NSPE 'Engineering Ethics: Cases and Materials' and the ASCE ethics case study archive.", strength: "Consider mentoring peers on safety-first thinking. Your instincts are an asset — leverage them to lead safety culture in teams." },
+    honesty:        { priority: "Practice 'difficult conversation' frameworks. Study whistleblower case studies like Enron engineers. Read IEEE's 'Ethics and the Internet' module.", growth: "Take an online module on technical communication ethics. Practice writing candid engineering reports with your faculty advisor.", strength: "Your integrity foundation is strong. Channel it into a reputation for honest technical assessments — it will define your career." },
+    accountability: { priority: "Run structured post-mortems on past projects. Study how accountability failures led to disasters like Bhopal. Practice blameless retrospectives.", growth: "Begin keeping an engineering decisions journal. Document decisions and their outcomes to build the habit of owning consequences.", strength: "Use your accountability strength to model transparent post-incident reviews in team settings." },
+    sustainability: { priority: "Take a course in Life Cycle Assessment (LCA). Study the Brundtland Report. Calculate the embodied carbon of your next project.", growth: "Explore the UN SDGs and their engineering implications. Consider LEED or BREEAM awareness training.", strength: "Lead a sustainability audit on an ongoing project. Your environmental thinking is increasingly demanded by clients and regulators." },
+    justice:        { priority: "Study algorithmic bias and infrastructure inequality case studies. Take an Intro to Equity in Design course.", growth: "Read 'Design Justice' by Sasha Costanza-Chock. Attend a workshop on inclusive engineering design.", strength: "Champion equity reviews in your project team. Offer to be the voice for underrepresented stakeholders in planning meetings." },
+    competence:     { priority: "Create a Personal Development Plan with concrete skill targets. Use IEEE Xplore to identify knowledge gaps. Find a mentor in your target domain.", growth: "Audit your expertise honestly. For any future project, identify 'known unknowns' and plan to fill them before committing.", strength: "Your commitment to competence sets you apart. Share this discipline with peers and document it in your professional portfolio." }
+  };
+  return recs[domainId]?.[type] || 'Continue developing your professional ethics through case studies and real-world practice.';
+}
+
+// ===================== SHAREABLE CARD =====================
+function buildShareCard(name, archetype, domainPct, overall, gradeInfo) {
+  document.getElementById('sc-name').textContent = name || 'Student';
+  document.getElementById('sc-archetype').textContent = `${archetype.glyph} ${archetype.title}`;
+  document.getElementById('sc-date').textContent = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  document.getElementById('sc-score').textContent = overall + '%';
+
+  const gradeBadge = document.getElementById('sc-grade-badge');
+  gradeBadge.textContent = `${gradeInfo.grade} · ${gradeInfo.label}`;
+  gradeBadge.style.background = gradeInfo.color + '22';
+  gradeBadge.style.color = gradeInfo.color;
+  gradeBadge.style.border = `1px solid ${gradeInfo.color}44`;
+
+  const barsEl = document.getElementById('sc-bars');
+  barsEl.innerHTML = DOMAINS.map(d => `
+    <div class="sc-bar-row">
+      <span class="sc-bar-label">${d.name.split(' ')[0]}</span>
+      <div class="sc-bar-track"><div class="sc-bar-fill" style="width:${domainPct[d.id]}%;background:${d.color}"></div></div>
+      <span class="sc-bar-pct">${domainPct[d.id]}%</span>
+    </div>
+  `).join('');
+}
+
+function copyResultsText() {
+  const { name, field, year } = window.userInfo || {};
+  const btn = document.getElementById('copyBtn');
+  // Build text
+  const archetype = document.getElementById('sc-archetype').textContent;
+  const overall   = document.getElementById('sc-score').textContent;
+  const grade     = document.getElementById('sc-grade-badge').textContent;
+  const lines     = Array.from(document.querySelectorAll('.sc-bar-row')).map(r => {
+    const label = r.querySelector('.sc-bar-label').textContent;
+    const pct   = r.querySelector('.sc-bar-pct').textContent;
+    return `  ${label}: ${pct}`;
+  });
+  const text = `⬡ ETHOS ENGINE — Ethics Assessment Results
+Name: ${name || 'Student'}
+Field: ${field || '—'} | Year: ${year || '—'}
+Archetype: ${archetype}
+Overall: ${overall} (${grade})
+Domain Scores:
+${lines.join('\n')}
+Assessed on ${document.getElementById('sc-date').textContent}`;
+
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✓ Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '📋 Copy Results Summary'; btn.classList.remove('copied'); }, 2500);
+  });
+}
+
+// ===================== TOAST =====================
+function showToast(message, type = 'info') {
+  let existing = document.querySelector('.toast');
+  if (existing) existing.remove();
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.style.cssText = `position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:${type === 'warning' ? '#ff8c42' : '#4f8eff'};color:#0a0c10;font-family:var(--font-display);font-weight:700;padding:12px 24px;border-radius:100px;font-size:0.88rem;z-index:300;animation:slideUp 0.3s ease;box-shadow:0 8px 30px rgba(0,0,0,0.3);`;
+  toast.textContent = message;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
+
+// ===================== UI =====================
+document.addEventListener('DOMContentLoaded', () => {
+  renderDomainCards();
+  initScrollObserver();
+  initNavScroll();
+  createMobileMenu();
+  highlightActiveNav();
+});
+
+function renderDomainCards() {
+  const grid = document.getElementById('domains-grid');
+  if (!grid) return;
+  DOMAINS.forEach((domain, i) => {
+    const card = document.createElement('div');
+    card.className = 'domain-card reveal delay-' + (i + 1);
+    card.style.setProperty('--domain-color', domain.color);
+    card.innerHTML = `<div class="domain-icon">${domain.icon}</div><div class="domain-name">${domain.name}</div><div class="domain-desc">${domain.description}</div><div class="domain-questions">${domain.questionCount} question${domain.questionCount > 1 ? 's' : ''}</div>`;
+    grid.appendChild(card);
+  });
+}
+
+function initScrollObserver() {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+}
+
+function initNavScroll() {
+  window.addEventListener('scroll', () => {
+    const navbar = document.getElementById('navbar');
+    navbar.classList.toggle('scrolled', window.scrollY > 60);
+    highlightActiveNav();
+  });
+}
+
+function highlightActiveNav() {
+  const sections = ['home', 'about', 'domains', 'assessment', 'results'];
+  const scrollY = window.scrollY + 100;
+  let active = 'home';
+  sections.forEach(id => {
+    const el = document.getElementById(id);
+    if (el && el.offsetTop <= scrollY) active = id;
+  });
+  document.querySelectorAll('.nav-link').forEach(link => {
+    link.classList.toggle('active', link.getAttribute('href') === '#' + active);
+  });
+}
+
+function scrollToSection(id) {
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function createMobileMenu() {
+  const overlay = document.createElement('div');
+  overlay.className = 'menu-overlay'; overlay.id = 'menu-overlay';
+  overlay.onclick = () => closeMenu();
+  const menu = document.createElement('nav');
+  menu.className = 'mobile-menu'; menu.id = 'mobile-menu';
+  const links = ['home', 'about', 'domains', 'assessment', 'results'];
+  const labels = ['Home', 'About', 'Domains', 'Assessment', 'Results'];
+  links.forEach((id, i) => {
+    const a = document.createElement('a');
+    a.href = '#' + id; a.textContent = labels[i];
+    a.onclick = () => { closeMenu(); scrollToSection(id); };
+    menu.appendChild(a);
+  });
+  document.body.appendChild(overlay);
+  document.body.appendChild(menu);
+}
+
+function toggleMenu() {
+  const menu = document.getElementById('mobile-menu');
+  const overlay = document.getElementById('menu-overlay');
+  const ham = document.getElementById('hamburger');
+  const isOpen = menu.classList.contains('open');
+  menu.classList.toggle('open', !isOpen);
+  overlay.classList.toggle('open', !isOpen);
+  const spans = ham.querySelectorAll('span');
+  if (!isOpen) {
+    spans[0].style.transform = 'rotate(45deg) translate(5px, 5px)';
+    spans[1].style.opacity = '0';
+    spans[2].style.transform = 'rotate(-45deg) translate(5px, -5px)';
+  } else {
+    spans.forEach(s => { s.style.transform = ''; s.style.opacity = ''; });
+  }
+}
+
+function closeMenu() {
+  const menu = document.getElementById('mobile-menu');
+  const overlay = document.getElementById('menu-overlay');
+  const ham = document.getElementById('hamburger');
+  menu.classList.remove('open');
+  overlay.classList.remove('open');
+  if (ham) ham.querySelectorAll('span').forEach(s => { s.style.transform = ''; s.style.opacity = ''; });
+}
+
+document.addEventListener('keydown', (e) => {
+  const quizVisible = !document.getElementById('quiz-screen').classList.contains('hidden');
+  if (!quizVisible) return;
+  const keyMap = { 'a': 0, 'b': 1, 'c': 2, 'd': 3, 'A': 0, 'B': 1, 'C': 2, 'D': 3 };
+  if (e.key in keyMap) {
+    const options = document.querySelectorAll('.option-item');
+    const idx = keyMap[e.key];
+    if (options[idx]) options[idx].click();
+  }
+  if (e.key === 'ArrowRight' || e.key === 'Enter') {
+    const nextBtn = document.getElementById('btn-next');
+    if (nextBtn) nextBtn.click();
+  }
+  if (e.key === 'ArrowLeft') {
+    const prevBtn = document.getElementById('btn-prev');
+    if (prevBtn && prevBtn.style.visibility !== 'hidden') prevBtn.click();
+  }
+});
+
+document.querySelectorAll('.pillar, .about-card, .intro-card').forEach(el => el.classList.add('reveal'));
+</script>
+</body>
+</html>
